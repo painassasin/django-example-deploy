@@ -32,7 +32,7 @@ services:
     <<: *backend
     command: sh -c "python manage.py migrate && \
       python manage.py collectstatic -c --no-input && \
-      python manage.py runserver 0.0.0.0:8000"
+      gunicorn config.wsgi --workers 4 --access-logfile - --error-logfile - -b 0.0.0.0:8000"
     volumes:
       - .:/app
       - static:/app/static
