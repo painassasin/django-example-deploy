@@ -1,0 +1,9 @@
+.PHONY: format check
+
+format:
+	ruff format .
+	ruff check . --fix
+
+check:
+	ruff check .
+	ruff format --check .

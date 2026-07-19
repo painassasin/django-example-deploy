@@ -1,0 +1,72 @@
+# ==========================================
+# Python Byte-Compiled / Cache Files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==========================================
+# Virtual Environments
+# ==========================================
+venv/
+.venv/
+env/
+.env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.secrets
+credentials.json
+*.pfx
+
+# ==========================================
+# Databases (Local Development Only)
+# ==========================================
+*.sqlite3
+*.db
+
+# ==========================================
+# Django Static & Media Files
+# ==========================================
+# Local media uploads from users should not be tracked
+media/
+# Collected static assets can be regenerated via collectstatic
+staticfiles/
+static/
+
+# ==========================================
+# Testing & Code Coverage
+# ==========================================
+htmlcov/
+.toast/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+
+# ==========================================
+# Operating System Files
+# ==========================================
+.DS_Store
+Thumbs.db
