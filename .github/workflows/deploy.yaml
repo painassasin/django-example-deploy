@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build-and-push:
@@ -33,3 +33,68 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+      - name: Create .env file
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG="${TAG#v}"
+          cat > .env << EOF
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          DEBUG=${{ secrets.DEBUG }}
+          ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          APP_TAG=$TAG
+          APP_PORT=${{ secrets.APP_PORT }}
+          DOCKERHUB_USERNAME=${{secrets.DOCKERHUB_USERNAME}}
+          EOF
+      - name: Prepare deployment files
+        run: cp docker-compose.deploy.yaml docker-compose.yaml
+      - name: Stop app
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd django-example
+            docker compose down -t 10 || true
+      - name: Copy new files to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: ".env,docker-compose.yaml,nginx.conf"
+          target: django-example
+          overwrite: true
+      - name: Deploy new image
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd django-example
+            docker compose pull
+            docker compose up -d --wait
+      - name: Cleanup
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker image prune -f --filter "until=24h"
