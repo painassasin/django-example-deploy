@@ -68,11 +68,6 @@ combine-as-imports = true
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
 
-[tool.coverage.run]
-source = ["."]
-relative_files = true
-branch = true
-
 [tool.coverage.report]
 omit = [
     "*/tests/*",
