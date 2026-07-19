@@ -22,7 +22,8 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "ruff (>=0.15.22,<0.16.0)"
+    "ruff (>=0.15.22,<0.16.0)",
+    "coverage (>=7.15.2,<8.0.0)"
 ]
 
 [tool.ruff]
@@ -44,6 +45,7 @@ ignore = [
     "DOC",
     "raw-string-in-exception",
     "missing-trailing-comma" ,
+    "raise-vanilla-args",
 ]
 select = ["ALL"]
 preview = true
@@ -51,6 +53,12 @@ preview = true
 [tool.ruff.lint.per-file-ignores]
 "*/migrations/*" = [
     "line-too-long",
+    "mutable-class-default",
+]
+"*/tests/*" = [
+    "missing-return-type-undocumented-public-function",
+    "pytest-unittest-assertion",
+    "pytest-unittest-raises-assertion",
 ]
 
 [tool.ruff.lint.isort]
@@ -58,3 +66,13 @@ combine-as-imports = true
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
+
+[tool.coverage.report]
+omit = [
+    "*/tests/*",
+    "*/asgi.py",
+    "*/wsgi.py",
+    "manage.py",
+]
+show_missing = true
+skip_covered = true
