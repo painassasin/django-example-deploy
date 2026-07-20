@@ -15,7 +15,7 @@ It performs the following basic checks:
 - Testing
 - Build
 
-For linting, `ruff` is used, but additional checks can be configured as needed.
+For linting, `ruff` and `typos` are used, but additional checks can be configured as needed.
 
 During the test stage, standard Django unit tests are executed against a PostgreSQL database.  
 After that, a coverage report is generated and sent to Codecov (this step is optional) **on main branch only**.
