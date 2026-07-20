@@ -24,7 +24,8 @@ build-backend = "poetry.core.masonry.api"
 [dependency-groups]
 dev = [
     "ruff (>=0.15.22,<0.16.0)",
-    "coverage (>=7.15.2,<8.0.0)"
+    "coverage (>=7.15.2,<8.0.0)",
+    "typos (>=1.48.0,<2.0.0)"
 ]
 
 [tool.ruff]

@@ -7,6 +7,7 @@ format:
 check:
 	ruff check .
 	ruff format --check .
+	typos .
 
 test:
 	coverage run manage.py test --shuffle
