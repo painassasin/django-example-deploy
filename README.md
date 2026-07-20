@@ -1,5 +1,7 @@
 # Django sample app with deploy actions example
+
 [![codecov](https://codecov.io/gh/painassasin/django-example-deploy/graph/badge.svg?token=t5mL2nsrzR)](https://codecov.io/gh/painassasin/django-example-deploy)
+[![Deploy](https://github.com/painassasin/django-example-deploy/actions/workflows/deploy.yaml/badge.svg)](https://github.com/painassasin/django-example-deploy/actions/workflows/deploy.yaml)
 
 This repository provides an example of deploying a Django application.  
 The application itself has no functional logic — the focus is entirely on the workflows.
@@ -45,7 +47,11 @@ The deployment process then performs the following actions:
 
 - Connects to the server and stops the currently running containers
 - Overwrites the `.env`, `docker-compose.yaml`, and `nginx.conf` files on the server  
-  (no other files are present on the server)  
-  - A dedicated Docker Compose file for production (`docker-compose.deploy.yaml`) is used
+  (no other files are present on the server)
+    - A dedicated Docker Compose file for production (`docker-compose.deploy.yaml`) is used
 - Starts the new containers
 - Cleans up old containers (images older than 24 hours are pruned)
+
+## Additional data
+
+To simplify CI/CD operations, I deliberately avoid using caching and "long" server pause on deploy.
