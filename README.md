@@ -18,7 +18,7 @@ It performs the following basic checks:
 For linting, `ruff` is used, but additional checks can be configured as needed.
 
 During the test stage, standard Django unit tests are executed against a PostgreSQL database.  
-After that, a coverage report is generated and sent to Codecov (this step is optional).
+After that, a coverage report is generated and sent to Codecov (this step is optional) **on main branch only**.
 
 In the final stage, the Docker image is built **only** — it is **not** pushed to any registry.  
 This simply verifies that the build completes without errors.
@@ -52,6 +52,6 @@ The deployment process then performs the following actions:
 - Starts the new containers
 - Cleans up old containers (images older than 24 hours are pruned)
 
-## Additional data
+## Additional notes
 
-To simplify CI/CD operations, I deliberately avoid using caching and "long" server pause on deploy.
+To simplify CD operations, I deliberately use "long" server pause on deploy.
