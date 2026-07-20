@@ -51,7 +51,3 @@ The deployment process then performs the following actions:
     - A dedicated Docker Compose file for production (`docker-compose.deploy.yaml`) is used
 - Starts the new containers
 - Cleans up old containers (images older than 24 hours are pruned)
-
-## Additional notes
-
-To simplify CD operations, I deliberately use "long" server pause on deploy.

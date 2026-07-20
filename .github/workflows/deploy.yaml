@@ -3,15 +3,13 @@ name: Deploy
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v*.*.*'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Log in to Docker Hub
@@ -33,6 +31,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     needs: build-and-push
@@ -41,12 +41,12 @@ jobs:
       name: production
       url: http://swiss.painassasin.org:8080/admin/
     steps:
-      - name: Check out code
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
       - name: Create .env file
         run: |
           TAG="${{ github.ref_name }}"
           TAG="${TAG#v}"
+
           cat > .env << EOF
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           DEBUG=${{ secrets.DEBUG }}
@@ -60,17 +60,7 @@ jobs:
           EOF
       - name: Prepare deployment files
         run: cp docker-compose.deploy.yaml docker-compose.yaml
-      - name: Stop app
-        uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd django-example
-            docker compose down -t 10 || true
-      - name: Copy new files to server
+      - name: Copy files to server
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -80,7 +70,7 @@ jobs:
           source: ".env,docker-compose.yaml,nginx.conf"
           target: django-example
           overwrite: true
-      - name: Deploy new image
+      - name: Deploy application
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -91,6 +81,9 @@ jobs:
             cd django-example
             docker compose pull
             docker compose up -d --wait
+      - name: Healthcheck
+        run: |
+          curl --retry 5 --retry-delay 3 --retry-connrefused -fsS http://swiss.painassasin.org:8080/admin/
       - name: Cleanup
         uses: appleboy/ssh-action@v1.2.5
         with:
@@ -99,4 +92,4 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            docker image prune -f --filter "until=24h"
+            docker image prune -af --filter "until=24h"
